@@ -27,42 +27,51 @@ export default function ContactPage() {
         {/* Left — form */}
         <Grid item xs={12} md={7}>
           <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
-            <Box component="form" onSubmit={handleSubmit}
-              sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {sent ? (
+              <Box sx={{ textAlign: 'center', py: 4 }}>
+                <Alert severity="success" sx={{ mb: 3 }}>
+                  Thank you! Your message has been received. We'll get back to you shortly.
+                </Alert>
+                <Button variant="outlined" onClick={() => setSent(false)}>
+                  Send Another Message
+                </Button>
+              </Box>
+            ) : (
+              <Box component="form" onSubmit={handleSubmit}
+                sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
 
-              {sent && <Alert severity="success">Message sent successfully!</Alert>}
-
-              <TextField
-                label="Name"
-                name="name"
-                value={form.name}
-                onChange={handleChange}
-                required
-                fullWidth
-              />
-              <TextField
-                label="Email"
-                name="email"
-                type="email"
-                value={form.email}
-                onChange={handleChange}
-                required
-                fullWidth
-              />
-              <TextField
-                label="Message"
-                name="message"
-                multiline
-                rows={4}
-                value={form.message}
-                onChange={handleChange}
-                required
-                fullWidth
-              />
-              <Button type="submit" variant="contained" size="large">
-                Send Message
-              </Button>
-            </Box>
+                <TextField
+                  label="Name"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  required
+                  fullWidth
+                />
+                <TextField
+                  label="Email"
+                  name="email"
+                  type="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  required
+                  fullWidth
+                />
+                <TextField
+                  label="Message"
+                  name="message"
+                  multiline
+                  rows={4}
+                  value={form.message}
+                  onChange={handleChange}
+                  required
+                  fullWidth
+                />
+                <Button type="submit" variant="contained" size="large">
+                  Send Message
+                </Button>
+              </Box>
+            )}
           </Paper>
         </Grid>
 

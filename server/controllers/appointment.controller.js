@@ -44,7 +44,20 @@ export async function changeStatus(req, res) {
 
 export async function reschedule(req, res) {
   try {
-    res.json(await rescheduleAppointment(req.params.id, req.body.scheduled_at));
+    const appt = await getAppointmentById(req.params.id);
+    if (!appt) return res.status(404).json({ message: 'Not found' });
+
+    const { role, id: userId } = req.user;
+    if (role === 'patient' && appt.patient_id !== userId)
+      return res.status(403).json({ message: 'Forbidden' });
+    if (role === 'doctor')
+      return res.status(403).json({ message: 'Doctors cannot reschedule appointments' });
+
+    const newTime = req.body.scheduled_at;
+    if (!newTime || new Date(newTime) <= new Date())
+      return res.status(400).json({ message: 'scheduled_at must be a future date' });
+
+    res.json(await rescheduleAppointment(appt.id, newTime));
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

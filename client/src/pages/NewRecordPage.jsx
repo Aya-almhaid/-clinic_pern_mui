@@ -1,42 +1,38 @@
 import { useState } from 'react';
 import {
   Box, Typography, Paper, TextField, Button,
-  Alert, CircularProgress
+  Alert, CircularProgress, MenuItem
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/client.js';
+import { useFetch } from '../hooks/useFetch.js';
 
 export default function NewRecordPage() {
-  // useState: each line creates one form field variable
-  const [patientId, setPatientId] = useState('');   // patient's ID number
-  const [diagnosis, setDiagnosis] = useState('');   // what the doctor diagnosed
-  const [notes, setNotes]         = useState('');   // extra notes (optional)
-  const [loading, setLoading]     = useState(false);// true while saving
-  const [error, setError]         = useState('');   // error message if save fails
+  const [patientId, setPatientId] = useState('');
+  const [diagnosis, setDiagnosis] = useState('');
+  const [notes, setNotes]         = useState('');
+  const [loading, setLoading]     = useState(false);
+  const [error, setError]         = useState('');
 
-  const navigate = useNavigate(); // used to go to another page after saving
+  const navigate = useNavigate();
+  const { data: users, loading: usersLoading } = useFetch('/users');
+  const patients = (users || []).filter(u => u.role === 'patient');
 
-  // This function runs when the doctor clicks Submit
   async function handleSubmit(e) {
-    e.preventDefault();          // stop the page from refreshing
-    setError('');                // clear any old error
-    setLoading(true);            // show the spinner
-
+    e.preventDefault();
+    setError('');
+    setLoading(true);
     try {
-      // Send the data to the backend
       await api.post('/records', {
-        patient_id: Number(patientId), // convert text to number
+        patient_id: Number(patientId),
         diagnosis,
         notes,
       });
-
-      // If it worked, go to the dashboard
       navigate('/dashboard');
     } catch (err) {
-      // If it failed, show the error message
       setError(err.response?.data?.message || 'Failed to save record.');
     } finally {
-      setLoading(false); // hide the spinner
+      setLoading(false);
     }
   }
 
@@ -51,25 +47,28 @@ export default function NewRecordPage() {
           Fill in the patient's diagnosis and notes.
         </Typography>
 
-        {/* Show error if something went wrong */}
         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
-        {/* The form */}
         <Box component="form" onSubmit={handleSubmit}
              sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
 
-          {/* Patient ID field */}
           <TextField
-            label="Patient ID"
-            type="number"
+            select
+            label="Patient"
             value={patientId}
             onChange={e => setPatientId(e.target.value)}
             required
             fullWidth
-            helperText="Enter the patient's user ID number"
-          />
+            disabled={usersLoading}
+            helperText={usersLoading ? 'Loading patients…' : 'Select the patient for this record'}
+          >
+            {patients.map(p => (
+              <MenuItem key={p.id} value={p.id}>
+                {p.name} — {p.email}
+              </MenuItem>
+            ))}
+          </TextField>
 
-          {/* Diagnosis field */}
           <TextField
             label="Diagnosis"
             multiline
@@ -80,7 +79,6 @@ export default function NewRecordPage() {
             fullWidth
           />
 
-          {/* Notes field */}
           <TextField
             label="Notes (optional)"
             multiline
@@ -90,7 +88,6 @@ export default function NewRecordPage() {
             fullWidth
           />
 
-          {/* Submit button */}
           <Button type="submit" variant="contained" size="large" disabled={loading}>
             {loading ? <CircularProgress size={24} color="inherit" /> : 'Save Record'}
           </Button>

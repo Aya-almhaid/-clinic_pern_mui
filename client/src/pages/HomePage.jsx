@@ -1,34 +1,20 @@
-import { Box, Typography, Button, Card, CardContent, Rating } from '@mui/material';
+import { Box, Typography, Button, Card, CardContent, Rating, Skeleton, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useFetch } from '../hooks/useFetch.js';
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const [feedback, setFeedback] = useState([]);
-
-  useEffect(() => {
-    // Replace this with your real API call, e.g.:
-    // fetch('/api/feedback/approved').then(res => res.json()).then(setFeedback);
-
-    // Mock data for now:
-    setFeedback([
-      { id: 1, rating: 5, comment: 'Excellent service!', name: 'Sara M.' },
-      { id: 2, rating: 4, comment: 'Very professional staff.', name: 'Ahmad K.' },
-    ]);
-  }, []);
+  const { data: feedbacks, loading } = useFetch('/feedback/approved');
+  const displayed = (feedbacks || []).slice(0, 3);
 
   return (
     <Box>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h4" fontWeight={700} gutterBottom>
         Welcome to ClinicCare
       </Typography>
 
-      <Typography variant="h6" gutterBottom>
+      <Typography variant="h6" color="text.secondary" gutterBottom>
         Your health is our priority
-      </Typography>
-
-      <Typography color="text.secondary" gutterBottom>
-        Clinic overview and approved feedback will appear here.
       </Typography>
 
       <Button
@@ -39,23 +25,44 @@ export default function HomePage() {
         Book Appointment
       </Button>
 
-      <Box component="section" sx={{ mt: 3 }}>
-        {feedback.length === 0 ? (
-          <Typography color="text.secondary">No feedback yet.</Typography>
-        ) : (
-          feedback.map((f) => (
-            <Card key={f.id} sx={{ mb: 2 }}>
-              <CardContent>
-                <Rating value={f.rating} readOnly />
-                <Typography>{f.comment}</Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {f.name}
-                </Typography>
-              </CardContent>
-            </Card>
-          ))
-        )}
-      </Box>
+      <Typography variant="h5" fontWeight={600} sx={{ mt: 4, mb: 2 }}>
+        What Our Patients Say
+      </Typography>
+
+      <Grid container spacing={2}>
+        {loading
+          ? [1, 2, 3].map((n) => (
+              <Grid item xs={12} md={4} key={n}>
+                <Card>
+                  <CardContent>
+                    <Skeleton variant="text" width={120} />
+                    <Skeleton variant="text" />
+                    <Skeleton variant="text" width="60%" />
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))
+          : displayed.length === 0
+          ? (
+              <Grid item xs={12}>
+                <Typography color="text.secondary">No feedback yet.</Typography>
+              </Grid>
+            )
+          : displayed.map((f) => (
+              <Grid item xs={12} md={4} key={f.id}>
+                <Card elevation={2} sx={{ borderRadius: 2, height: '100%' }}>
+                  <CardContent>
+                    <Rating value={f.rating} readOnly size="small" />
+                    <Typography sx={{ mt: 1 }}>{f.comment}</Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                      — {f.name || f.user_name || 'Patient'}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))
+        }
+      </Grid>
     </Box>
   );
 }
