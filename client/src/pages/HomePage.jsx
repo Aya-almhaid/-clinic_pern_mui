@@ -5,7 +5,7 @@ import { useFetch } from '../hooks/useFetch.js';
 export default function HomePage() {
   const navigate = useNavigate();
   const { data: feedbacks, loading } = useFetch('/feedback/approved');
-  const displayed = (feedbacks || []).slice(0, 3);
+  const displayed = (feedbacks?.feedback || []).slice(0, 3);
 
   return (
     <Box>
