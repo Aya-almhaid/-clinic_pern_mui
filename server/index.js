@@ -1,0 +1,29 @@
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import { connectDB } from './Config/connectPool.js';
+
+import authRoutes from './routes/auth.routes.js';
+import userRoutes from './routes/user.routes.js';
+import doctorRoutes from './routes/doctor.routes.js';
+import appointmentRoutes from './routes/appointment.routes.js';
+import recordRoutes from './routes/medicalRecord.routes.js';
+import prescriptionRoutes from './routes/prescription.routes.js';
+import feedbackRoutes from './routes/feedback.routes.js';
+
+dotenv.config();
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/doctors', doctorRoutes);
+app.use('/api/appointments', appointmentRoutes);
+app.use('/api/records', recordRoutes);
+app.use('/api/prescriptions', prescriptionRoutes);
+app.use('/api/feedback', feedbackRoutes);
+
+const PORT = process.env.PORT || 5000;
+connectDB().then(() => app.listen(PORT, () => console.log(`Server running on port ${PORT}`)));
