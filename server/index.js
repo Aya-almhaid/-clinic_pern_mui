@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { connectDB } from './Config/connectPool.js';
+import { errorHandler } from './middleware/error.middleware.js';
 
 import authRoutes from './routes/auth.routes.js';
 import userRoutes from './routes/user.routes.js';
@@ -24,6 +25,8 @@ app.use('/api/appointments', appointmentRoutes);
 app.use('/api/records', recordRoutes);
 app.use('/api/prescriptions', prescriptionRoutes);
 app.use('/api/feedback', feedbackRoutes);
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 connectDB().then(() => app.listen(PORT, () => console.log(`Server running on port ${PORT}`)));

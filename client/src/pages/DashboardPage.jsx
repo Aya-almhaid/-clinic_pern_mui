@@ -84,7 +84,7 @@ function DoctorDashboard({ user }) {
                 }
               >
                 <ListItemText
-                  primary={`Patient: ${a.patient_name}`}
+                  primary={`Patient: ${a.patient_name || 'Unknown'}`}
                   secondary={`${new Date(a.scheduled_at).toLocaleString()}${a.reason ? ' — ' + a.reason : ''}`}
                 />
               </ListItem>

@@ -76,7 +76,7 @@ export default function ContactPage() {
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               <Typography>📍 123 Health Street, Medical City</Typography>
               <Typography>📞 +1 (555) 123-4567</Typography>
-              <Typography>✉️  contact@cliniccare.com</Typography>
+              <Typography>✉️  admin@clinic.com</Typography>
               <Typography>🕐 Mon Sunday: 8am – 6pm</Typography>
               <Typography>🕐 Saturday: 9am – 2pm</Typography>
               <Typography>🚫 Friday: Closed</Typography>
