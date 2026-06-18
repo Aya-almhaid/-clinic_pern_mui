@@ -1,6 +1,6 @@
 # ClinicCare — Clinic Management System
 
-A full-stack clinic management web application built with the **PERN stack** (PostgreSQL, Express, React, Node.js) and **Material UI**.
+A full-stack clinic management web application built with the **PERN stack** (PostgreSQL, Express, React, Node.js) and **Material UI v9**.
 
 ---
 
@@ -11,8 +11,8 @@ ClinicCare supports three user roles with distinct capabilities:
 | Role    | Key Capabilities |
 |---------|-----------------|
 | Patient | Book appointments, view medical records & prescriptions, submit feedback |
-| Doctor  | Manage appointment statuses, create medical records & prescriptions, moderate feedback |
-| Admin   | Manage all users and doctors, moderate feedback, full system access |
+| Doctor  | Role-specific dashboard, manage appointments, create records & prescriptions, moderate feedback |
+| Admin   | Live stats dashboard, manage all users and doctors, moderate feedback, full system access |
 
 ---
 
@@ -20,8 +20,8 @@ ClinicCare supports three user roles with distinct capabilities:
 
 | Layer     | Technology |
 |-----------|-----------|
-| Frontend  | React 18 + Vite, React Router v6, Material UI v5, Axios |
-| Backend   | Node.js, Express 4, JWT authentication, bcryptjs |
+| Frontend  | React 19 + Vite 8, React Router v7, Material UI v9, Axios |
+| Backend   | Node.js, Express 5, JWT authentication, bcryptjs |
 | Database  | PostgreSQL (via `pg` connection pool) |
 | Auth      | JWT (7-day tokens), role-based access control |
 
@@ -36,7 +36,7 @@ clinic_pern_mui/
 │   ├── controllers/    # Business logic (7 modules)
 │   ├── middleware/     # JWT auth, role guards, validation, error handler
 │   ├── models/         # Parameterized SQL queries (7 modules)
-│   ├── routes/         # Express routers (7 modules)
+│   ├── routes/         # Express routers (8 modules)
 │   ├── db/schema.sql   # Full database schema
 │   ├── seed.js         # Demo data seeder
 │   └── index.js        # Express entry point
@@ -97,49 +97,64 @@ node seed.js
 # Terminal 1 — backend (http://localhost:5000)
 cd server && npm run dev
 
-# Terminal 2 — frontend (http://localhost:5173)
+# Terminal 2 — frontend (http://localhost:5175)
 cd client && npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173) in your browser.
+Open [http://localhost:5175](http://localhost:5175) in your browser.
 
 ---
 
 ## Demo Accounts
 
-After running `node seed.js` the following accounts are ready:
-
-| Role    | Email                | Password   | Name            |
-|---------|----------------------|------------|-----------------|
-| Admin   | admin@clinic.com     | Admin123   | Admin User      |
-| Doctor  | dr.sarah@clinic.com  | Doctor123  | Dr. Sarah Ahmed (Cardiology) |
-| Doctor  | dr.omar@clinic.com   | Doctor123  | Dr. Omar Hassan (Neurology) |
-| Patient | john@clinic.com      | Patient123 | John Smith      |
-| Patient | sara@clinic.com      | Patient123 | Sara Ali        |
-
-The seed also creates: 5 appointments across all statuses, 2 medical records, 4 prescriptions, follow-up notes, and 3 feedback entries.
+| Role    | Email             | Password | Name         |
+|---------|-------------------|----------|--------------|
+| Admin   | admin@clinic.com  | 123456   | Admin User   |
+| Doctor  | sara@clinic.com   | 123456   | Doctor Sara  |
+| Doctor  | aya@clinic.com    | 123456   | Aya Almhaid  |
+| Patient | lolo@gmail.com    | 123456   | lolo         |
 
 ---
 
 ## Feature Matrix
 
-| Feature                        | Patient | Doctor | Admin |
-|-------------------------------|:-------:|:------:|:-----:|
-| View doctors list              | ✓       | ✓      | ✓     |
-| Book appointment               | ✓       |        |       |
-| Cancel own appointment         | ✓       |        |       |
-| Reschedule own appointment     | ✓       |        |       |
-| View own appointments          | ✓       | ✓      | ✓     |
-| Confirm / complete appointment |         | ✓      | ✓     |
-| Create medical record          |         | ✓      |       |
-| Add follow-up notes to record  |         | ✓      | ✓     |
-| View own medical records       | ✓       |        |       |
-| Add prescription               |         | ✓      |       |
-| View own prescriptions         | ✓       |        |       |
-| Submit feedback                | ✓       | ✓      | ✓     |
-| Moderate feedback              |         | ✓      | ✓     |
-| Manage users                   |         |        | ✓     |
-| Manage doctors                 |         |        | ✓     |
+| Feature                         | Patient | Doctor | Admin |
+|--------------------------------|:-------:|:------:|:-----:|
+| Role-specific dashboard         | ✓       | ✓      | ✓     |
+| View doctors list               | ✓       | ✓      | ✓     |
+| Book appointment                | ✓       |        |       |
+| Cancel own appointment          | ✓       |        |       |
+| Reschedule own appointment      | ✓       |        |       |
+| View own appointments           | ✓       | ✓      | ✓     |
+| Confirm / complete appointment  |         | ✓      | ✓     |
+| Create medical record           |         | ✓      |       |
+| Add follow-up notes to record   |         | ✓      | ✓     |
+| View own medical records        | ✓       |        |       |
+| Add prescription                |         | ✓      |       |
+| View prescriptions              | ✓       | ✓      |       |
+| Submit feedback                 | ✓       | ✓      | ✓     |
+| Moderate feedback               |         | ✓      | ✓     |
+| Manage users                    |         |        | ✓     |
+| Manage doctors                  |         |        | ✓     |
+| View live clinic stats          |         |        | ✓     |
+
+---
+
+## Dashboards
+
+### Patient Dashboard
+- Quick access cards linking to: Book Appointment, My Records, Prescriptions, Submit Feedback
+
+### Doctor Dashboard
+- **Stats**: Upcoming / Today / Completed / Cancelled appointment counts
+- **Today's Appointments**: list of appointments scheduled for today
+- **Upcoming Appointments**: next 5 upcoming with patient name and time
+- **Quick Access**: Prescriptions, New Medical Record, Appointments, Moderate Feedback
+
+### Admin Dashboard
+- **Stats cards**: Total Patients, Total Doctors, Total Appointments, Pending Feedback
+- **Recent Appointments**: table of last 5 appointments with patient, doctor, time, and status
+- **Quick Access**: Manage Users, Manage Doctors, Moderate Feedback, Appointments
 
 ---
 
@@ -154,13 +169,20 @@ The seed also creates: 5 appointments across all statuses, 2 medical records, 4 
 
 ### Users — `/api/users`
 
+| Method | Endpoint    | Auth     | Description |
+|--------|-------------|----------|-------------|
+| GET    | `/me`       | Any role | Get own profile |
+| PATCH  | `/me`       | Any role | Update profile or change password |
+| GET    | `/patients` | Any role | List all patients |
+| GET    | `/`         | Admin    | List all users |
+| GET    | `/:id`      | Admin    | Get user by ID |
+| DELETE | `/:id`      | Admin    | Delete user |
+
+### Patients — `/api/patients`
+
 | Method | Endpoint | Auth     | Description |
 |--------|----------|----------|-------------|
-| GET    | `/me`    | Any role | Get own profile |
-| PATCH  | `/me`    | Any role | Update profile or change password |
-| GET    | `/`      | Admin    | List all users |
-| GET    | `/:id`   | Admin    | Get user by ID |
-| DELETE | `/:id`   | Admin    | Delete user (cascades all data) |
+| GET    | `/`      | Any role | List all patients (used for record creation) |
 
 ### Doctors — `/api/doctors`
 
@@ -176,7 +198,7 @@ The seed also creates: 5 appointments across all statuses, 2 medical records, 4 
 | Method | Endpoint          | Auth    | Description |
 |--------|-------------------|---------|-------------|
 | POST   | `/`               | Patient | Book appointment |
-| GET    | `/me`             | Any     | Get own appointments |
+| GET    | `/me`             | Any     | Get own appointments (admin gets all) |
 | PATCH  | `/:id/status`     | Any     | Change status (role-restricted) |
 | PATCH  | `/:id/reschedule` | Patient | Reschedule to a future date |
 
@@ -196,8 +218,8 @@ The seed also creates: 5 appointments across all statuses, 2 medical records, 4 
 | Method | Endpoint       | Auth           | Description |
 |--------|----------------|----------------|-------------|
 | POST   | `/`            | Doctor         | Create prescription |
-| GET    | `/me`          | Patient        | Get own prescriptions |
-| GET    | `/record/:id`  | Patient/Doctor | Get prescriptions for a record |
+| GET    | `/me`          | Patient/Doctor | Patient: own prescriptions. Doctor: prescriptions they wrote |
+| GET    | `/record/:id`  | Patient/Doctor | Get prescriptions for a specific record |
 
 ### Feedback — `/api/feedback`
 
@@ -231,52 +253,54 @@ feedback        — id, user_id (FK→users), rating (1-5), comment,
 
 ## Pages
 
-| Page               | Route                  | Access         |
-|--------------------|------------------------|----------------|
-| Landing            | `/`                    | Public         |
-| Home               | `/home`                | Public         |
-| About              | `/about`               | Public         |
-| Contact            | `/contact`             | Public         |
-| Public Feedbacks   | `/feedbacks`           | Public         |
-| Login              | `/login`               | Public         |
-| Register           | `/register`            | Public         |
-| Dashboard          | `/dashboard`           | All roles      |
-| Profile            | `/profile`             | All roles      |
-| Doctors            | `/doctors`             | All roles      |
-| Appointments       | `/appointments`        | All roles      |
-| Book Appointment   | `/appointments/book`   | Patient        |
-| My Records         | `/records`             | Patient        |
-| Record Detail      | `/records/:id`         | Patient        |
-| Prescriptions      | `/prescriptions`       | Patient        |
-| Submit Feedback    | `/feedback/submit`     | All roles      |
-| New Record         | `/records/new`         | Doctor         |
-| Moderate Feedback  | `/admin/feedback`      | Doctor / Admin |
-| Manage Users       | `/admin/users`         | Admin          |
-| Manage Doctors     | `/admin/doctors`       | Admin          |
+| Page               | Route                  | Access          |
+|--------------------|------------------------|-----------------|
+| Landing            | `/`                    | Public          |
+| Home               | `/home`                | Public          |
+| About              | `/about`               | Public          |
+| Contact            | `/contact`             | Public          |
+| Public Feedbacks   | `/feedbacks`           | Public          |
+| Login              | `/login`               | Public          |
+| Register           | `/register`            | Public          |
+| Dashboard          | `/dashboard`           | All roles       |
+| Profile            | `/profile`             | All roles       |
+| Doctors            | `/doctors`             | All roles       |
+| Appointments       | `/appointments`        | All roles       |
+| Book Appointment   | `/appointments/book`   | Patient         |
+| My Records         | `/records`             | Patient         |
+| Record Detail      | `/records/:id`         | Patient / Doctor|
+| New Record         | `/records/new`         | Doctor          |
+| Prescriptions      | `/prescriptions`       | Patient / Doctor|
+| Submit Feedback    | `/feedback/submit`     | All roles       |
+| Moderate Feedback  | `/admin/feedback`      | Doctor / Admin  |
+| Manage Users       | `/admin/users`         | Admin           |
+| Manage Doctors     | `/admin/doctors`       | Admin           |
 
 ---
 
 ## Demo Walkthrough
 
-### As a Patient (john@clinic.com)
+### As a Patient (lolo@gmail.com / 123456)
 1. Login → Dashboard shows quick-access cards
-2. **Book Appointment** → pick a doctor from the dropdown, choose a date and reason
+2. **Book Appointment** → pick a doctor, choose a date and reason
 3. **Appointments** → view status, cancel a pending booking
 4. **My Records** → view diagnoses created by doctors
 5. **Prescriptions** → see all medications prescribed
 6. **Submit Feedback** → rate the clinic 1–5 stars
 
-### As a Doctor (dr.sarah@clinic.com)
-1. Login → Dashboard shows upcoming / completed / cancelled stats
+### As a Doctor (sara@clinic.com / 123456)
+1. Login → Dashboard shows today's appointments, upcoming list, and stats
 2. **Appointments** → confirm pending → mark completed after the visit
 3. **New Record** → select a patient from the dropdown, enter diagnosis and notes
-4. **Moderate Feedback** → approve or reject patient submissions
+4. **Prescriptions** → view all prescriptions you have written (with patient names)
+5. **Moderate Feedback** → approve or reject patient submissions
 
-### As an Admin (admin@clinic.com)
-1. Login → Dashboard shows admin quick-access cards
-2. **Manage Users** → view all users by role, delete accounts
-3. **Manage Doctors** → add an existing patient as a doctor
-4. **Moderate Feedback** → approve or reject feedback
+### As an Admin (admin@clinic.com / 123456)
+1. Login → Dashboard shows live stats: patients, doctors, appointments, pending feedback
+2. **Recent Appointments** table on dashboard
+3. **Manage Users** → view all users by role, delete accounts
+4. **Manage Doctors** → add an existing patient as a doctor
+5. **Moderate Feedback** → approve or reject feedback
 
 ---
 
@@ -287,7 +311,6 @@ feedback        — id, user_id (FK→users), rating (1-5), comment,
 - No token refresh (tokens expire after 7 days — users must log in again)
 - No pagination on list endpoints
 - CORS is open to all origins (restrict in production)
-- Use a strong JWT secret and DB password in any non-local environment
 
 ---
 
