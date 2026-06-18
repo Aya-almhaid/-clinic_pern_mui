@@ -11,12 +11,25 @@ import appointmentRoutes from './routes/appointment.routes.js';
 import recordRoutes from './routes/medicalRecord.routes.js';
 import prescriptionRoutes from './routes/prescription.routes.js';
 import feedbackRoutes from './routes/feedback.routes.js';
+import { pool } from './Config/connectPool.js';
+import { verifyToken } from './middleware/auth.middleware.js';
 
 dotenv.config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+app.get('/api/patients', verifyToken, async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      "SELECT id, name, email FROM users WHERE role = 'patient' ORDER BY name"
+    );
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);

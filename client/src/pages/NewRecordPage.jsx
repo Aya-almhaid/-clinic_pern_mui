@@ -15,13 +15,7 @@ export default function NewRecordPage() {
   const [error, setError]         = useState('');
 
   const navigate = useNavigate();
-  const { data: appointments, loading: usersLoading, error: patientsError } = useFetch('/appointments/me');
-  const patients = Object.values(
-    (appointments || []).reduce((acc, a) => {
-      if (!acc[a.patient_id]) acc[a.patient_id] = { id: a.patient_id, name: a.patient_name };
-      return acc;
-    }, {})
-  );
+  const { data: patients, loading: usersLoading, error: patientsError } = useFetch('/patients');
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -73,9 +67,9 @@ export default function NewRecordPage() {
               : 'Select the patient for this record'
             }
           >
-            {patients.map(p => (
+            {(patients || []).map(p => (
               <MenuItem key={p.id} value={p.id}>
-                {p.name}
+                {p.name} — {p.email}
               </MenuItem>
             ))}
           </TextField>
