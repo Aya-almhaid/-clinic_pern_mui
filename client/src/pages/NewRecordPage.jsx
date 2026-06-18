@@ -15,8 +15,7 @@ export default function NewRecordPage() {
   const [error, setError]         = useState('');
 
   const navigate = useNavigate();
-  const { data: users, loading: usersLoading } = useFetch('/users');
-  const patients = (users || []).filter(u => u.role === 'patient');
+  const { data: patients, loading: usersLoading } = useFetch('/users/patients');
 
   async function handleSubmit(e) {
     e.preventDefault();

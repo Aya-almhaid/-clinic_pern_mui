@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { getAllUsers, getUserById, updateUserById, deleteUserById, updateUserPassword, getUserWithHash } from '../models/user.Model.js';
+import { getAllUsers, getUserById, updateUserById, deleteUserById, updateUserPassword, getUserWithHash, getPatients } from '../models/user.Model.js';
 
 export async function getMe(req, res) {
   try {
@@ -49,6 +49,14 @@ export async function deleteUser(req, res) {
   try {
     await deleteUserById(req.params.id);
     res.json({ message: 'Deleted' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+}
+
+export async function listPatients(req, res) {
+  try {
+    res.json(await getPatients());
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

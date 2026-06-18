@@ -44,3 +44,10 @@ export async function deleteUserById(id) {
 export async function updateUserRole(id, role) {
   await pool.query('UPDATE users SET role = $1 WHERE id = $2', [role, id]);
 }
+
+export async function getPatients() {
+  const { rows } = await pool.query(
+    "SELECT id, name, email, phone FROM users WHERE role = 'patient' ORDER BY name"
+  );
+  return rows;
+}
