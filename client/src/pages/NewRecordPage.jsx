@@ -61,7 +61,7 @@ export default function NewRecordPage() {
             disabled={usersLoading}
             helperText={usersLoading ? 'Loading patients…' : 'Select the patient for this record'}
           >
-            {patients.map(p => (
+            {(patients || []).map(p => (
               <MenuItem key={p.id} value={p.id}>
                 {p.name} — {p.email}
               </MenuItem>
