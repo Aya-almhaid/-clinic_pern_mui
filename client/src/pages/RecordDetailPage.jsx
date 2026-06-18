@@ -1,18 +1,26 @@
 import { useState, useEffect } from 'react';
 import {
   Box, Typography, Paper, CircularProgress, Alert,
-  Divider, Chip, List, ListItem, ListItemText
+  Divider, Chip, List, ListItem, ListItemText,
+  TextField, Button
 } from '@mui/material';
 import { useParams } from 'react-router-dom';
 import api from '../api/client.js';
+import { useAuth } from '../context/AuthContext.jsx';
 
 export default function RecordDetailPage() {
   const { id } = useParams();
-  const [record, setRecord]           = useState(null);
+  const { user } = useAuth();
+  const [record, setRecord]               = useState(null);
   const [prescriptions, setPrescriptions] = useState([]);
-  const [notes, setNotes]             = useState([]);
-  const [loading, setLoading]         = useState(true);
-  const [error, setError]             = useState('');
+  const [notes, setNotes]                 = useState([]);
+  const [loading, setLoading]             = useState(true);
+  const [error, setError]                 = useState('');
+
+  const [rxForm, setRxForm]   = useState({ medication: '', dosage: '', instructions: '', duration: '' });
+  const [rxLoading, setRxLoading] = useState(false);
+  const [rxError, setRxError]     = useState('');
+  const [rxSuccess, setRxSuccess] = useState('');
 
   useEffect(() => {
     Promise.all([
@@ -28,6 +36,22 @@ export default function RecordDetailPage() {
       .catch(() => setError('Failed to load record.'))
       .finally(() => setLoading(false));
   }, [id]);
+
+  async function handleAddPrescription(e) {
+    e.preventDefault();
+    setRxError(''); setRxSuccess('');
+    setRxLoading(true);
+    try {
+      const res = await api.post('/prescriptions', { record_id: Number(id), ...rxForm });
+      setPrescriptions(prev => [...prev, res.data]);
+      setRxForm({ medication: '', dosage: '', instructions: '', duration: '' });
+      setRxSuccess('Prescription added.');
+    } catch (err) {
+      setRxError(err.response?.data?.message || 'Failed to add prescription.');
+    } finally {
+      setRxLoading(false);
+    }
+  }
 
   if (loading) return <Box sx={{ py: 4, textAlign: 'center' }}><CircularProgress /></Box>;
   if (error)   return <Alert severity="error" sx={{ m: 3 }}>{error}</Alert>;
@@ -69,6 +93,42 @@ export default function RecordDetailPage() {
           ))
         }
       </Paper>
+
+      {/* Add Prescription — doctors only */}
+      {user?.role === 'doctor' && (
+        <Paper variant="outlined" sx={{ p: 3, borderRadius: 2, mb: 3 }}>
+          <Typography variant="h6" fontWeight={700} mb={2}>Add Prescription</Typography>
+          {rxError   && <Alert severity="error"   sx={{ mb: 2 }}>{rxError}</Alert>}
+          {rxSuccess && <Alert severity="success" sx={{ mb: 2 }}>{rxSuccess}</Alert>}
+          <Box component="form" onSubmit={handleAddPrescription}
+               sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <TextField
+                label="Medication" value={rxForm.medication} required fullWidth
+                onChange={e => setRxForm(f => ({ ...f, medication: e.target.value }))}
+              />
+              <TextField
+                label="Dosage" value={rxForm.dosage} required fullWidth
+                onChange={e => setRxForm(f => ({ ...f, dosage: e.target.value }))}
+                placeholder="e.g. 500mg"
+              />
+            </Box>
+            <TextField
+              label="Instructions" value={rxForm.instructions} fullWidth multiline rows={2}
+              onChange={e => setRxForm(f => ({ ...f, instructions: e.target.value }))}
+              placeholder="e.g. Take twice daily with food"
+            />
+            <TextField
+              label="Duration" value={rxForm.duration} fullWidth
+              onChange={e => setRxForm(f => ({ ...f, duration: e.target.value }))}
+              placeholder="e.g. 7 days"
+            />
+            <Button type="submit" variant="contained" disabled={rxLoading} sx={{ alignSelf: 'flex-start' }}>
+              {rxLoading ? 'Adding…' : 'Add Prescription'}
+            </Button>
+          </Box>
+        </Paper>
+      )}
 
       {/* Follow-up notes */}
       {notes.length > 0 && (

@@ -23,12 +23,12 @@ export default function NewRecordPage() {
     setError('');
     setLoading(true);
     try {
-      await api.post('/records', {
+      const res = await api.post('/records', {
         patient_id: Number(patientId),
         diagnosis,
         notes,
       });
-      navigate('/dashboard');
+      navigate(`/records/${res.data.id}`);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to save record.');
     } finally {
