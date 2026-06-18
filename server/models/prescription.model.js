@@ -26,3 +26,16 @@ export async function getPrescriptionsForPatient(patient_id) {
   );
   return rows;
 }
+
+export async function getPrescriptionsForDoctor(user_id) {
+  const { rows } = await pool.query(
+    `SELECT p.*, u.name AS patient_name FROM prescriptions p
+     JOIN medical_records r ON r.id = p.record_id
+     JOIN doctors d ON d.id = r.doctor_id
+     JOIN users u ON u.id = r.patient_id
+     WHERE d.user_id = $1
+     ORDER BY p.created_at DESC`,
+    [user_id]
+  );
+  return rows;
+}

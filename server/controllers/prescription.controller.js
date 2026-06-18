@@ -1,4 +1,4 @@
-import { createPrescription, getPrescriptionsByRecordId, getPrescriptionsForPatient } from '../models/prescription.model.js';
+import { createPrescription, getPrescriptionsByRecordId, getPrescriptionsForPatient, getPrescriptionsForDoctor } from '../models/prescription.model.js';
 import { getRecordById } from '../models/medicalRecord.model.js';
 import { getDoctorByUserId } from '../models/doctors.Model.js';
 
@@ -16,7 +16,10 @@ export async function addPrescription(req, res) {
 
 export async function myPrescriptions(req, res) {
   try {
-    res.json(await getPrescriptionsForPatient(req.user.id));
+    const data = req.user.role === 'doctor'
+      ? await getPrescriptionsForDoctor(req.user.id)
+      : await getPrescriptionsForPatient(req.user.id);
+    res.json(data);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

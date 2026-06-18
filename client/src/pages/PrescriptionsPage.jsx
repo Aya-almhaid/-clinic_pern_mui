@@ -4,8 +4,11 @@ import {
   TableContainer, TableHead, TableRow, CircularProgress, Alert, Chip
 } from '@mui/material';
 import api from '../api/client.js';
+import { useAuth } from '../context/AuthContext.jsx';
 
 export default function PrescriptionsPage() {
+  const { user } = useAuth();
+  const isDoctor = user?.role === 'doctor';
   const [list, setList]       = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError]     = useState('');
@@ -19,9 +22,13 @@ export default function PrescriptionsPage() {
 
   return (
     <Box sx={{ maxWidth: 900, mx: 'auto', py: 4 }}>
-      <Typography variant="h5" fontWeight={700} gutterBottom>My Prescriptions</Typography>
+      <Typography variant="h5" fontWeight={700} gutterBottom>
+        {isDoctor ? 'Prescriptions I Wrote' : 'My Prescriptions'}
+      </Typography>
       <Typography color="text.secondary" mb={3}>
-        All medications prescribed to you by your doctors.
+        {isDoctor
+          ? 'All prescriptions you have issued to your patients.'
+          : 'All medications prescribed to you by your doctors.'}
       </Typography>
 
       {error   && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
@@ -36,6 +43,7 @@ export default function PrescriptionsPage() {
           <Table>
             <TableHead>
               <TableRow sx={{ bgcolor: 'grey.50' }}>
+                {isDoctor && <TableCell><b>Patient</b></TableCell>}
                 <TableCell><b>Medication</b></TableCell>
                 <TableCell><b>Dosage</b></TableCell>
                 <TableCell><b>Instructions</b></TableCell>
@@ -46,6 +54,7 @@ export default function PrescriptionsPage() {
             <TableBody>
               {list.map(p => (
                 <TableRow key={p.id} hover>
+                  {isDoctor && <TableCell>{p.patient_name || '—'}</TableCell>}
                   <TableCell>
                     <Typography fontWeight={600}>{p.medication}</Typography>
                   </TableCell>

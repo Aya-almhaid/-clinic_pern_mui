@@ -63,7 +63,7 @@ export default function NewRecordPage() {
             helperText={
               usersLoading ? 'Loading patients…'
               : patientsError ? 'Failed to load — restart the server and refresh'
-              : patients.length === 0 ? 'No patients from your appointments yet'
+              : (patients || []).length === 0 ? 'No patients registered yet'
               : 'Select the patient for this record'
             }
           >
