@@ -15,7 +15,13 @@ export default function NewRecordPage() {
   const [error, setError]         = useState('');
 
   const navigate = useNavigate();
-  const { data: patients, loading: usersLoading, error: patientsError } = useFetch('/users/patients');
+  const { data: appointments, loading: usersLoading, error: patientsError } = useFetch('/appointments/me');
+  const patients = Object.values(
+    (appointments || []).reduce((acc, a) => {
+      if (!acc[a.patient_id]) acc[a.patient_id] = { id: a.patient_id, name: a.patient_name };
+      return acc;
+    }, {})
+  );
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -63,13 +69,13 @@ export default function NewRecordPage() {
             helperText={
               usersLoading ? 'Loading patients…'
               : patientsError ? 'Failed to load — restart the server and refresh'
-              : (patients || []).length === 0 ? 'No patients found in the system'
+              : patients.length === 0 ? 'No patients from your appointments yet'
               : 'Select the patient for this record'
             }
           >
-            {(patients || []).map(p => (
+            {patients.map(p => (
               <MenuItem key={p.id} value={p.id}>
-                {p.name} — {p.email}
+                {p.name}
               </MenuItem>
             ))}
           </TextField>
