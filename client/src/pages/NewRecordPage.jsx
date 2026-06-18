@@ -15,7 +15,7 @@ export default function NewRecordPage() {
   const [error, setError]         = useState('');
 
   const navigate = useNavigate();
-  const { data: patients, loading: usersLoading } = useFetch('/users/patients');
+  const { data: patients, loading: usersLoading, error: patientsError } = useFetch('/users/patients');
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -47,6 +47,7 @@ export default function NewRecordPage() {
         </Typography>
 
         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+        {patientsError && <Alert severity="warning" sx={{ mb: 2 }}>Could not load patients: {patientsError}</Alert>}
 
         <Box component="form" onSubmit={handleSubmit}
              sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
@@ -58,8 +59,13 @@ export default function NewRecordPage() {
             onChange={e => setPatientId(e.target.value)}
             required
             fullWidth
-            disabled={usersLoading}
-            helperText={usersLoading ? 'Loading patients…' : 'Select the patient for this record'}
+            disabled={usersLoading || (patients || []).length === 0}
+            helperText={
+              usersLoading ? 'Loading patients…'
+              : patientsError ? 'Failed to load — restart the server and refresh'
+              : (patients || []).length === 0 ? 'No patients found in the system'
+              : 'Select the patient for this record'
+            }
           >
             {(patients || []).map(p => (
               <MenuItem key={p.id} value={p.id}>
