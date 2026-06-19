@@ -7,6 +7,9 @@ const { Pool } = pg;
 
 export const pool = new Pool({
   connectionString: process.env.CONNECTION_STRING,
+  ssl: process.env.CONNECTION_STRING?.includes('localhost')
+    ? false
+    : { rejectUnauthorized: false },
 });
 
 export async function connectDB() {
