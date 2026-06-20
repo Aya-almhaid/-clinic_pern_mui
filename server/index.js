@@ -15,8 +15,13 @@ import patientRoutes from './routes/patient.routes.js';
 
 dotenv.config();
 
+const allowedOrigins = [
+  'http://localhost:5175',
+  'https://clinic-pern-mui-oez6.vercel.app',
+];
+
 const app = express();
-app.use(cors());
+app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
