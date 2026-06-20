@@ -21,9 +21,14 @@ const allowedOrigins = [
 ];
 
 const app = express();
-app.use(cors({ origin: allowedOrigins }));
+app.use(cors({ origin: "}));
 app.use(express.json());
-
+app.use(cors({
+  origin:"https://clinic-pern-mui-oez6.vercel.app",
+   credentials:true,
+  methods:["GET","POST","PUT","DELETE"],
+            
+            )
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/doctors', doctorRoutes);
