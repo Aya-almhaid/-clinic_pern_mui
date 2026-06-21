@@ -3,7 +3,6 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { connectDB } from './Config/connectPool.js';
 import { errorHandler } from './middleware/error.middleware.js';
-
 import authRoutes from './routes/auth.routes.js';
 import userRoutes from './routes/user.routes.js';
 import doctorRoutes from './routes/doctor.routes.js';
@@ -17,7 +16,7 @@ dotenv.config();
 
 
 const app = express();
-app.use(cors({ origin: "https://clinic-pern-mui-oez6.vercel.app", 
+app.use(cors({ origin: "https://clinic-pern-mui-oez6.vercel.app",
   credentials:true,
   methods:["GET","POST","PUT","DELETE"]
 }));
@@ -35,4 +34,5 @@ app.use('/api/patients', patientRoutes);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
+
 connectDB().then(() => app.listen(PORT, () => console.log(`Server running on port ${PORT}`)));
