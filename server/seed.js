@@ -58,7 +58,7 @@ async function seed() {
   const { rows: appts } = await pool.query(`
     INSERT INTO appointments (patient_id, doctor_id, scheduled_at, status, reason) VALUES
       ($1, $3, NOW() + INTERVAL '3 days',  'pending',   'Chest pain and shortness of breath'),
-      ($1, $3, NOW() + INTERVAL '7 days',  'confirmed', 'Follow-up after ECG results'),
+      ($1, $3, NOW() + INTERVAL '7 days',  'pending',   'Follow-up after ECG results'),
       ($1, $4, NOW() - INTERVAL '5 days',  'completed', 'Recurring migraines evaluation'),
       ($2, $3, NOW() - INTERVAL '10 days', 'completed', 'Annual heart checkup'),
       ($2, $3, NOW() - INTERVAL '2 days',  'cancelled', 'Routine blood pressure review')
