@@ -17,7 +17,9 @@ export async function connectDB() {
     await pool.query('SELECT 1');
     console.log('PostgreSQL connected');
   } catch (err) {
-    console.error('Database connection failed:', err.message);
+    console.error('Database connection failed:', err.message || err.code || err);
+    if (err.errors) console.error('Underlying errors:', err.errors.map((e) => e.message || e.code || e));
+    console.error('CONNECTION_STRING is set:', Boolean(process.env.CONNECTION_STRING));
     process.exit(1);
   }
 }
