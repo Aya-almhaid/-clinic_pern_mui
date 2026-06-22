@@ -15,14 +15,21 @@ import patientRoutes from './routes/patient.routes.js';
 dotenv.config();
 
 
-const allowedOrigins = [
-  "https://clinic-pern-mui-oez6.vercel.app",
-  "https://clinic-pern-mui-static.onrender.com",
-  "http://localhost:5175",
+const allowedOriginPatterns = [
+  /^https:\/\/clinic-pern-mui(-[a-z0-9]+)*\.vercel\.app$/,
+  /^https:\/\/clinic-pern-mui-static\.onrender\.com$/,
+  /^http:\/\/localhost:\d+$/,
 ];
 
 const app = express();
-app.use(cors({ origin: allowedOrigins,
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOriginPatterns.some((pattern) => pattern.test(origin))) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials:true,
   methods:["GET","POST","PUT","PATCH","DELETE"]
 }));
